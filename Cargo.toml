@@ -29,6 +29,9 @@ multiboot = "0.8"
 uart_16550 = "0.3"
 x86_64 = { version = "0.15", default-features = false, features = ["instructions"] }
 
+[patch.crates-io]
+x86_64 = {path = "/home/simon/hermit/x86_64"}
+
 [target.'cfg(target_arch = "aarch64")'.dependencies]
 aarch64-cpu = "10"
 hermit-dtb = { version = "0.1" }
