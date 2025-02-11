@@ -39,11 +39,14 @@ fn main() -> Status {
 
 	let rsdp = rsdp();
 
+	let cc_blob = cc_blob();
 	drop(kernel_image);
 
 	let fdt = Fdt::new()
 		.unwrap()
 		.rsdp(u64::try_from(rsdp.expose_addr()).unwrap())
+		.unwrap()
+		.cc_blob(u64::try_from(cc_blob.expose_addr()).unwrap())
 		.unwrap();
 
 	allocator::exit_boot_services();
@@ -128,5 +131,18 @@ fn rsdp() -> *const c_void {
 		};
 		info!("Found ACPI {version} RSDP at {rsdp:p}");
 		rsdp
+	})
+}
+
+fn cc_blob() -> *const c_void {
+	let guid = uefi::Guid::parse_or_panic("067b1f5f-cf26-44c5-8554-93d777912d42");
+	system::with_config_table(|config_table| {
+		let cc_blob = if let Some(entry) = config_table.iter().find(|entry| entry.guid == guid) {
+			entry.address
+		} else {
+			panic!("EFI SNP CC Blob not found!");
+		};
+		info!("Found EFI SNP CC Blob at {cc_blob:p}");
+		cc_blob
 	})
 }

@@ -41,6 +41,16 @@ impl Fdt {
 		Ok(self)
 	}
 
+	pub fn cc_blob(mut self, cc_blob: u64) -> FdtWriterResult<Self> {
+		let cc_blob_node = self
+			.writer
+			.begin_node(&format!("hermit,cc_blob@{cc_blob:x}"))?;
+		self.writer.property_array_u64("reg", &[cc_blob, 1])?;
+		self.writer.end_node(cc_blob_node)?;
+
+		Ok(self)
+	}
+
 	pub fn memory_map(mut self, memory_map: &mut impl MemoryMapMut) -> FdtWriterResult<Self> {
 		memory_map.sort();
 		info!("Memory map:\n{}", memory_map.display());
